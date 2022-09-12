@@ -1,27 +1,13 @@
+mod world;
+use world::World;
+
 use std::env;
 use std::fs::File;
 use std::io::Read;
+
 fn help() {
     eprintln!("Usage:\n -w [file location]");
 }
-
-fn read_wld(file_name: &str) -> Result<(), std::io::Error> {
-    const BUFFER_SIZE: usize = 256;
-
-    // open target file
-    let mut file = File::open(&file_name)?;
-
-    // we'll use this buffer to get data
-    let mut buffer = [0; BUFFER_SIZE];
-
-    // reader WLD version
-    let _ = file.by_ref().take(BUFFER_SIZE.try_into().unwrap()).read(&mut buffer)?;
-    for v in &buffer {
-        print!("{:02X}",v);
-    }
-    Ok(())
-}
-
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -36,12 +22,14 @@ fn main() {
             },
             "-h" => {
                 help();
-                std::process::exit(1);
             }
             &_ => i+=1,
         }
     }
     if &world_file != "" {
-        read_wld(&world_file);
+        // INIT world struct
+        let test = World.new(&world_file);
+        test.read_wld();
+
     }
 }
