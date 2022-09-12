@@ -1,6 +1,8 @@
 # Eye of Ocram
 
-An Xbox 360 Terraria world parser (and hopefully viewer)...
+A Terraria world parser (and hopefully viewer; primarily made for Xbox 360 saves)...
+
+
 
 ### Useful Sources:
 
