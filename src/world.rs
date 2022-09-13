@@ -16,7 +16,7 @@ impl World {
             name: "".to_string(),
         }
     }
-    pub fn read_wld(&mut self) -> Result<(), std::io::Error> {
+    pub fn read_wld(&mut self) {// -> Result<(), std::io::Error> {
         const BUFFER_SIZE: usize = 256;
 
         // open target file
@@ -33,7 +33,7 @@ impl World {
             print!("{:02X} ",v);
         }
         println!("\nWorld Version : 0x{:02X}",self.version);
-        Ok(())
+//        Ok(())
     }
 
 }
