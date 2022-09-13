@@ -8,19 +8,19 @@ pub struct World {
     pub name: String, // length is byte before i think...
 }
 impl World {
-    pub fn new(&self,wldfile:&String,) -> World { 
+    pub fn new(wldfile:&String) -> World { 
         World {
             file_name: wldfile.to_string(),
-            version: self.version,
-            name_len: self.name_len,
-            name: self.name,
+            version: 0,
+            name_len: 0,
+            name: "".to_string(),
         }
     }
     pub fn read_wld(&mut self) -> Result<(), std::io::Error> {
         const BUFFER_SIZE: usize = 256;
 
         // open target file
-        let mut file = File::open(self.file_name)?;
+        let mut file = File::open(self.file_name.to_owned())?;
 
         // we'll use this buffer to get data
         let mut buffer = [0; BUFFER_SIZE];
@@ -32,7 +32,7 @@ impl World {
         for v in &buffer {
             print!("{:02X} ",v);
         }
-
+        println!("\nWorld Version : 0x{:02X}",self.version);
         Ok(())
     }
 

@@ -2,8 +2,6 @@ mod world;
 use world::World;
 
 use std::env;
-use std::fs::File;
-use std::io::Read;
 
 fn help() {
     eprintln!("Usage:\n -w [file location]");
@@ -28,7 +26,7 @@ fn main() {
     }
     if &world_file != "" {
         // INIT world struct
-        let test = World.new(&world_file);
+        let mut test = World::new(&world_file);
         test.read_wld();
 
     }
