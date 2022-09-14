@@ -4,7 +4,7 @@ use std::io::Read;
 pub struct World {
     pub file_name: String,
     pub version: u8, // first byte of file
-    pub name_len: u8, // the byte at someplace
+    pub name_len: usize, // the byte at someplace
     pub name: String, // length is byte before i think...
 }
 impl World {
@@ -30,10 +30,14 @@ impl World {
         // print out every value
         self.version = buffer[0];
         println!("World version : {:?}",self.version);
-        if self.version == 69 {
-            self.name_len = buffer[8];
-            println!("World name is {:?} bits / 4 characters long.",self.name_len);
-            self.name = std::str::from_utf8(&buffer[9 as usize..self.name_len as usize]).unwrap().to_string();
+        if self.version >= 68 {
+            self.name_len = buffer[8] as usize;
+            
+            println!("World name is 0x{:02X} chars long.",self.name_len);
+            println!("{:?}",&buffer[9 as usize..(9+self.name_len) as usize]);
+            
+            self.name = std::str::from_utf8(&buffer[9 as usize..(9+self.name_len) as usize]).unwrap().to_string();
+            
             println!("{:?}",self.name);
             print!("\n");
             
