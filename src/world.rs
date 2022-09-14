@@ -30,13 +30,13 @@ impl World {
         // print out every value
         self.version = buffer[0];
         println!("World version : {:?}",self.version);
-        if self.version >= 68 {
+        if self.version != 0 {
             self.name_len = buffer[8] as usize;
             
             println!("World name is 0x{:02X} chars long.",self.name_len);
-            println!("{:?}",&buffer[9 as usize..(9+self.name_len) as usize]);
+            println!("{:?}",&buffer[9 as usize..][..self.name_len as usize]);
             
-            self.name = std::str::from_utf8(&buffer[9 as usize..(9+self.name_len) as usize]).unwrap().to_string();
+            self.name = std::str::from_utf8(&buffer[9 as usize..][..self.name_len as usize]).unwrap().to_string();
             
             println!("{:?}",self.name);
             print!("\n");
