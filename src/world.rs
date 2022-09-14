@@ -29,10 +29,15 @@ impl World {
         let _ = file.by_ref().take(BUFFER_SIZE.try_into().unwrap()).read(&mut buffer)?;
         // print out every value
         self.version = buffer[0];
+        println!("World version : {:?}",self.version);
+        self.name_len = buffer[8];
+        println!("World name is {:?} bits / 4 characters long.",self.name_len);
+        self.name = std::str::from_utf8(&buffer[9 as usize..self.name_len as usize]).unwrap().to_string();
+        println!("{:?}",self.name);
+        print!("\n");
         for v in &buffer {
             print!("{:02X} ",v);
         }
-        println!("\nWorld Version : 0x{:02X}",self.version);
         Ok(())
     }
 
