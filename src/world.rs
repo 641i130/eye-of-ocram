@@ -11,7 +11,7 @@ impl World {
     pub fn new(wldfile:&String) -> World { 
         World {
             file_name: wldfile.to_string(),
-            version: 0,
+            version: 0, // int 32 
             name_len: 0,
             name: "".to_string(),
         }
@@ -28,24 +28,25 @@ impl World {
         // Read file into buffer!!!
         let _ = file.by_ref().take(BUFFER_SIZE.try_into().unwrap()).read(&mut buffer)?;
         // print out every value
-        self.version = buffer[0];
-        println!("World version : {:?}",self.version);
-        if self.version != 0 {
+        self.version = buffer[0]; // world version byte!!!
+        if self.version != 0 { // make sure world version is not modern TODO
             self.name_len = buffer[8] as usize;
-            
-            println!("World name is 0x{:02X} chars long.",self.name_len);
-            println!("{:?}",&buffer[9 as usize..][..self.name_len as usize]);
-            
+            // println!("{:?}",&buffer[9 as usize..][..self.name_len as usize]);
             self.name = std::str::from_utf8(&buffer[9 as usize..][..self.name_len as usize]).unwrap().to_string();
             
-            println!("{:?}",self.name);
-            print!("\n");
+
             
         }
+        // print out the file that we've read in so far...
         for v in &buffer {
             print!("{:02X} ",v);
         }
         Ok(())
+    }
+    pub fn pretty_print(self) {
+        println!("\nWorld version : {:?}",self.version);
+        println!("World name is 0x{:02X} chars long.",self.name_len);
+        println!("{:?}\n",self.name);
     }
 
 }
