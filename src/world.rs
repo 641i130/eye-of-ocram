@@ -1,6 +1,10 @@
 use std::fs::File;
 use std::io::Read;
 
+mod reader;
+use reader::Parse;
+
+
 pub struct World {
     pub file_name: String,
     pub version: u8, // first byte of file

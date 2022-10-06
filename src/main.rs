@@ -28,6 +28,6 @@ fn main() {
         // INIT world struct
         let mut test = World::new(&world_file);
         test.read_wld().expect("World read fail");
-        //test.pretty_print();
+        test.pretty_print();
     }
 }

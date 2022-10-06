@@ -1,0 +1,3 @@
+[submodule "terrariaSource"]
+	path = terrariaSource
+	url = git@github.com:EdgeKiller/terrariaSource.git
