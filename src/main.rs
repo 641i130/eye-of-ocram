@@ -1,6 +1,9 @@
 mod world;
 use world::World;
 
+mod reader;
+use reader::WldReader;
+
 use std::env;
 
 fn help() {
@@ -28,6 +31,6 @@ fn main() {
         // INIT world struct
         let mut test = World::new(&world_file);
         test.read_wld().expect("World read fail");
-        test.pretty_print();
+        //test.pretty_print();
     }
 }

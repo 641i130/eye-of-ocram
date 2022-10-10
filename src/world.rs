@@ -1,9 +1,4 @@
-use std::fs::File;
-use std::io::Read;
-
-mod reader;
-use reader::Parse;
-
+use crate::reader::WldReader;
 
 pub struct World {
     pub file_name: String,
@@ -20,31 +15,8 @@ impl World {
             name: "".to_string(),
         }
     }
-    pub fn read_wld(&mut self) -> Result<(), std::io::Error> {
-        const BUFFER_SIZE: usize = 256;
-
-        // open target file
-        let mut file = File::open(self.file_name.to_owned())?;
-
-        // we'll use this buffer to get data
-        let mut buffer = [0; BUFFER_SIZE];
-
-        // Read file into buffer!!!
-        let _ = file.by_ref().take(BUFFER_SIZE.try_into().unwrap()).read(&mut buffer)?;
-        // print out every value
-        self.version = buffer[0]; // world version byte!!!
-        if self.version != 0 { // make sure world version is not modern TODO
-            self.name_len = buffer[8] as usize;
-            // println!("{:?}",&buffer[9 as usize..][..self.name_len as usize]);
-            self.name = std::str::from_utf8(&buffer[9 as usize..][..self.name_len as usize]).unwrap().to_string();
-            
-
-            
-        }
-        // print out the file that we've read in so far...
-        for v in &buffer {
-            print!("{:02X} ",v);
-        }
+    pub fn read_wld(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        let mut wld_parser = WldReader::new(&self.file_name);
         Ok(())
     }
     pub fn pretty_print(self) {
