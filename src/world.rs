@@ -17,7 +17,6 @@ impl World {
     }
     pub fn read_wld(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         let mut wldp = WldReader::new(&self.file_name);
-        wldp.
         Ok(())
     }
     pub fn pretty_print(self) {
