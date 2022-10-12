@@ -14,13 +14,20 @@ impl World {
             name: "".to_string(),
         }
     }
-    fn get_byte<R: std::io::Read>(mut iterator: std::io::Bytes<R>) -> u8 {
-        iterator.next().expect("").unwrap()
+    fn get_byte<R: std::io::Read>(iterator: &mut std::io::Bytes<R>) -> u8 {
+        iterator.next().expect("No more bytes").unwrap()
+    }
+    fn skip_bytes<R: std::io::Read>(iterator: &mut std::io::Bytes<R>,count: u8) {
+        for _ in 0..count {
+            let skipped = iterator.next().expect("No more bytes!").unwrap();
+        }
     }
     pub fn read_wld(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         let mut wldp = WldReader::new(&self.file_name);
         let mut iterator = wldp.input.bytes();
-        println!("{:?}",World::get_byte(iterator)); 
+        self.version = World::get_byte(&mut iterator);
+        World::skip_bytes(&mut iterator,8); // Skip 8 bytes!
+        println!("{:?}",World::get_byte(&mut iterator));
         Ok(())
     }
     pub fn pretty_print(self) {

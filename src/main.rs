@@ -2,7 +2,6 @@ mod world;
 use world::World;
 
 mod reader;
-use reader::WldReader;
 
 use std::env;
 

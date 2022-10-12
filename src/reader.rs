@@ -1,6 +1,4 @@
-use std::io::prelude::*;
 use std::fs::File;
-use std::io::{Read,BufReader};
 
 pub struct WldReader {
     pub wld_path: String,
