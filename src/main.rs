@@ -30,6 +30,7 @@ fn main() {
     if &world_file != "" {
         // INIT world struct
         let mut test = World::new(&world_file);
-        //test.pretty_print();
+        test.read_wld();
+        test.pretty_print();
     }
 }
