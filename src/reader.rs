@@ -14,5 +14,5 @@ impl WldReader {
             offset: 0,
             input: File::open(wld_path.to_string()).expect("Cannot read file."),
         }
-    } 
+    }
 }
