@@ -67,7 +67,10 @@ impl World {
         self.name = World::read_string(&mut iterator); // Read first byte, then read the following
                                                        // bytes as a char array then convert to
                                                        // string
+        
+        // USED FOR MAP STUFF ???
         self.file_type = World::get_byte(&mut iterator);
+
         self.w_left = World::get_byte(&mut iterator);
         self.w_right = World::get_byte(&mut iterator);
         self.w_top = World::get_byte(&mut iterator);
@@ -76,7 +79,7 @@ impl World {
         self.max_tiles_y = World::get_byte(&mut iterator);
         self.max_tiles_x = World::get_byte(&mut iterator);
         
-        self.moon_type = World::get_byte(&mut iterator);
+        self.moon_type = World::get_byte(&mut iterator); // maybe its actually creation time
         Ok(())
     }
     pub fn pretty_print(self) {
@@ -87,6 +90,9 @@ impl World {
         println!("\tT:{} B:{}", self.w_top as i32, self.w_bot as i32);
         println!("Max Tiles X:{}", self.max_tiles_x as i32);
         println!("Max Tiles Y:{}", self.max_tiles_y as i32);
-        println!("Moon type:{}",self.moon_type);
+        println!("Moon type:{}",self.moon_type); // My guess is there are these options:
+                                                      // 10011111
+                                                      // 01011111
+                                                      // 00111111
     }
 }
