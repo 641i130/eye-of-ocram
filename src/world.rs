@@ -20,7 +20,7 @@ pub struct World {
     pub rock_layer: i16, // ReadInt16
     pub world_time: f32, // ReadSingle
     pub day_time: bool, // 0 is false && else is true
-    pub moon_phase: i8, // ReadByte
+    pub moon_phase: u8, // ReadByte
     pub blood_moon: bool,
     pub dungeonx: i16,
     pub dungeony: i16,
@@ -35,9 +35,9 @@ pub struct World {
     pub frost_down: bool,
     pub shadow_orb_smashed: bool,
     pub spawn_meteor: bool,
-    pub altar_count: i32,
+    pub altar_count: u8,
     pub hard_mode: bool,
-    pub invasion_delay: i8,
+    pub invasion_delay: u8,
     pub invasion_size: i16,
     pub invasion_type: i8,
     pub invasionx: f32,
@@ -175,8 +175,26 @@ impl World {
         // 1862
         self.world_time = World::read_single(&mut iterator)?;
         self.day_time = World::read_bool(&mut iterator)?;
-        self.moon_phase = World::read_byte(&mut iterator)?;
-
+        self.moon_phase = World::get_byte(&mut iterator);
+        self.blood_moon = World::read_bool(&mut iterator)?;
+        self.dungeonx = World::read_i16(&mut iterator)?;
+        self.dungeony = World::read_i16(&mut iterator)?;
+        self.boss_1_down = World::read_bool(&mut iterator)?;
+        self.boss_2_down = World::read_bool(&mut iterator)?;
+        self.boss_3_down = World::read_bool(&mut iterator)?;
+        self.saved_goblin = World::read_bool(&mut iterator)?;
+        self.saved_wizard = World::read_bool(&mut iterator)?;
+        self.saved_mech = World::read_bool(&mut iterator)?;
+        self.goblins_down = World::read_bool(&mut iterator)?;
+        self.clown_down = World::read_bool(&mut iterator)?;
+        self.frost_down = World::read_bool(&mut iterator)?;
+        self.shadow_orb_smashed = World::read_bool(&mut iterator)?;
+        self.spawn_meteor = World::read_bool(&mut iterator)?;
+        self.altar_count = World::get_byte(&mut iterator);
+        self.hard_mode = World::read_bool(&mut iterator)?;
+        self.invasion_delay = World::get_byte(&mut iterator);
+        self.invasion_size = World::read_i16(&mut iterator)?;
+        self.invasionx = World::read_single(&mut iterator)?;
 
         Ok(())
     }
