@@ -39,7 +39,7 @@ pub struct World {
     pub hard_mode: bool,
     pub invasion_delay: u8,
     pub invasion_size: i16,
-    pub invasion_type: i8,
+    pub invasion_type: u8,
     pub invasionx: f32,
     // 1887
 
@@ -194,6 +194,7 @@ impl World {
         self.hard_mode = World::read_bool(&mut iterator)?;
         self.invasion_delay = World::get_byte(&mut iterator);
         self.invasion_size = World::read_i16(&mut iterator)?;
+        self.invasion_type = World::get_byte(&mut iterator);
         self.invasionx = World::read_single(&mut iterator)?;
 
         Ok(())
