@@ -1,9 +1,21 @@
 use std::io::Read;
 use std::fs::File;
 
+enum Flags {
+    wallframe_mask = 0x3,
+    nearby = 0x4,
+    visited = 0x8,
+    wire = 0x10,
+    selected = 0x20,
+    lava = 0x20,
+    checking_liquid = 0x40,
+    skip_liquid = 0x80,
+    highlight_mask = 0x24,
+}
+
 #[derive(Debug)]
 pub struct Tile {
-
+    pub flags: Flags,
 }
 
 #[derive(Debug)]
