@@ -15,7 +15,18 @@ enum Flags {
 
 #[derive(Debug)]
 pub struct Tile {
+    pub active: u8, // all byte types should be this type in rust
+    pub t_type: u8,
     pub flags: Flags,
+    pub liquid: u8,
+    pub lava: u8,
+    pub wall: u8,
+    pub wallframe_x: u16, // ushort
+    pub wallframe_y: u16, // ushort
+    pub frame_num: u8,
+    pub frame_x: u8,
+    pub frame_y: u8,
+
 }
 
 #[derive(Debug)]
