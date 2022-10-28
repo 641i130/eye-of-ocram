@@ -17,6 +17,7 @@ pub struct World {
     pub spawn_tile_x: i16,
     pub spawn_tile_y: i16,
     pub world_surface: i16,
+    pub rock_layer: i16,
 }
 impl World {
     pub fn new(wldfile: &String) -> World {
@@ -35,6 +36,7 @@ impl World {
             spawn_tile_x: 0,
             spawn_tile_y: 0,
             world_surface: 0,
+            rock_layer: 0,
         }
     }
     fn get_byte<R: std::io::Read>(iterator: &mut std::io::Bytes<R>) -> u8 {
@@ -46,6 +48,8 @@ impl World {
         }
     }
     fn read_i32<R: std::io::Read>(iterator: &mut std::io::Bytes<R>) -> i32 {
+        i32::from_le_bytes(iterator.next_chunk(4))
+        /*
         let mut out:[u8;4] = [0,0,0,0];
         let mut c = 0;
         for _ in 0..4 { // read 4 bytes into i32
@@ -53,6 +57,7 @@ impl World {
             c+=1;
         }
         i32::from_le_bytes(out) as i32
+        */
     }
     fn read_i16<R: std::io::Read>(iterator: &mut std::io::Bytes<R>) -> i16 {
         let mut out:[u8;2] = [0,0];

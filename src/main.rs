@@ -1,7 +1,6 @@
+#![feature(iter_next_chunk)]
 mod world;
 use world::World;
-
-mod reader;
 
 use std::env;
 
