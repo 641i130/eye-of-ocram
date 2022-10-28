@@ -26,7 +26,16 @@ pub struct Tile {
     pub frame_num: u8,
     pub frame_x: u8,
     pub frame_y: u8,
-
+}
+pub impl Tile {
+    fn get_wallframe_num(&self) -> i32 {
+        // This casts the flags bytes into i32 i think
+        // (int)(flags & Flags.WALLFRAME_MASK);
+        (self.flags & Flags.wallframe_mask) as i32
+    }
+    fn set_wallframe_num(&mut self) {
+        self.flags = (Flags.WALLFRAME_MASK | Flags.)
+    }
 }
 
 #[derive(Debug)]
