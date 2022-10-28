@@ -9,7 +9,7 @@ pub struct World {
     pub file_type: i32, // first byte of file
     pub world_timestamp: i32, // first byte of file
     pub w_left: i16,    // World Dimensions
-    pub w_right: i32,
+    pub w_right: i32, // ReadInt32
     pub w_top: i16,
     pub w_bot: i16,
     pub max_tiles_x: i16,
@@ -17,7 +17,33 @@ pub struct World {
     pub spawn_tile_x: i16,
     pub spawn_tile_y: i16,
     pub world_surface: i16,
-    pub rock_layer: i16,
+    pub rock_layer: i16, // ReadInt16
+    pub world_time: f32, // ReadSingle
+    pub day_time: bool, // 0 is false && else is true
+    pub moon_phase: i8, // ReadByte
+    pub blood_moon: bool,
+    pub dungeonx: i16,
+    pub dungeony: i16,
+    pub boss_1_down: bool,
+    pub boss_2_down: bool,
+    pub boss_3_down: bool,
+    pub saved_goblin: bool,
+    pub saved_wizard: bool,
+    pub saved_mech: bool,
+    pub goblins_down: bool,
+    pub clown_down: bool,
+    pub frost_down: bool,
+    pub shadow_orb_smashed: bool,
+    pub spawn_meteor: bool,
+    pub altar_count: i32,
+    pub hard_mode: bool,
+    pub invasion_delay: i8,
+    pub invasion_size: i16,
+    pub invasion_type: i8,
+    pub invasionx: f32,
+    // 1887
+
+
 }
 impl World {
     pub fn new(wldfile: &String) -> World {
@@ -37,25 +63,60 @@ impl World {
             spawn_tile_y: 0,
             world_surface: 0,
             rock_layer: 0,
+            world_time: 0.0, // ReadSingle
+            day_time: false, // 0 is false && else is true
+            moon_phase: 0, // ReadByte
+            blood_moon: false,
+            dungeonx: 0,
+            dungeony: 0,
+            boss_1_down: false,
+            boss_2_down: false,
+            boss_3_down: false,
+            saved_goblin: false,
+            saved_wizard: false,
+            saved_mech: false,
+            goblins_down: false,
+            clown_down: false,
+            frost_down: false,
+            shadow_orb_smashed: false,
+            spawn_meteor: false,
+            altar_count: 0,
+            hard_mode: false,
+            invasion_delay: 0,
+            invasion_size: 0,
+            invasion_type: 0,
+            invasionx: 0.0,
         }
+    }
+    fn convert_using_from_iter<const N:usize,T,E> (r : [Result<T, E>; N]) -> Result<[T; N], E>  where T : std::fmt::Debug {
+        // Helper function for file::iterator into i32 (from byte array)
+        let result : Vec<_> = Result::from_iter (r.into_iter ())?;
+        Ok (result.try_into ().unwrap ())
     }
     fn get_byte<R: std::io::Read>(iterator: &mut std::io::Bytes<R>) -> u8 {
         iterator.next().expect("No more bytes").unwrap()
+    }
+    fn read_bool<R: std::io::Read>(iterator: &mut std::io::Bytes<R>) -> Result<bool,Box<dyn std::error::Error>> {
+        if iterator.next().expect("No more bytes").unwrap() != 0 {
+            return Ok(true);
+        }
+        return Ok(false);
     }
     fn skip_bytes<R: std::io::Read>(iterator: &mut std::io::Bytes<R>, count: usize) {
         for _ in 0..count {
             let _ = iterator.next().expect("No more bytes!").unwrap();
         }
     }
-    fn read_i32<R: std::io::Read>(iterator: &mut std::io::Bytes<R>) -> i32 {
-        let val:[u8;4] = iterator.next_chunk::<4>().unwrap().map(|val| val.unwrap());
-        i32::from_le_bytes(val)
+    fn read_i32<R: std::io::Read>(iterator: &mut std::io::Bytes<R>) -> Result<i32,Box<dyn std::error::Error>> {
+        Ok(i32::from_le_bytes(Self::convert_using_from_iter (iterator.next_chunk::<4>().map_err (|_e| "could not read 4 bytes")?)?))
     }
-    fn read_i16<R: std::io::Read>(iterator: &mut std::io::Bytes<R>) -> i16 {
-        let val:[u8;2] = iterator.next_chunk::<2>().unwrap().map(|val| val.unwrap());
-        i16::from_le_bytes(val)
+    fn read_single<R: std::io::Read>(iterator: &mut std::io::Bytes<R>) -> Result<f32,Box<dyn std::error::Error>> {
+        Ok(f32::from_le_bytes(Self::convert_using_from_iter (iterator.next_chunk::<4>().map_err (|_e| "could not read 4 bytes")?)?) as f32)
     }
-    fn read_string<R: std::io::Read>(iterator: &mut std::io::Bytes<R>) -> String {
+    fn read_i16<R: std::io::Read>(iterator: &mut std::io::Bytes<R>) -> Result<i16,Box<dyn std::error::Error>> {
+        Ok(i16::from_le_bytes(Self::convert_using_from_iter (iterator.next_chunk::<2>().map_err (|_e| "could not read 4 bytes")?)?))
+    }
+    fn read_string<R: std::io::Read>(iterator: &mut std::io::Bytes<R>) -> Result<String,Box<dyn std::error::Error>> {
         // readString(length) {
         // if (length === undefined) { //7 bit encoded int32
         //     length = 0;
@@ -72,46 +133,50 @@ impl World {
             // Get string length
             out.push(World::get_byte(iterator) as char);
         }
-        out.iter().cloned().collect::<String>()
+        Ok(out.iter().cloned().collect::<String>())
     }
     pub fn read_wld(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         let wld = File::open(&self.file_name.to_string()).expect("Cannot read file.");
         let mut iterator = wld.bytes();
 
         // TODO move to reader with the iterator etc etc
-        self.version = World::read_i32(&mut iterator);
+        self.version = World::read_i32(&mut iterator)?;
         World::skip_bytes(&mut iterator, 4); // Skip 4 bytes! // TODO fix this
         // fileIO.ReadString();
-        self.name = World::read_string(&mut iterator); // Read first byte, then read the following
+        self.name = World::read_string(&mut iterator)?; // Read first byte, then read the following
                                                        // bytes as a char array then convert to
                                                        // string
 		// int worldID = fileIO.ReadInt32();
-        self.file_type = World::read_i32(&mut iterator);
+        self.file_type = World::read_i32(&mut iterator)?;
 		// int worldTimestamp = (release >= 48) ? fileIO.ReadInt32() : 0;
         if self.version >= 48 {
-            self.world_timestamp = World::read_i32(&mut iterator);
+            self.world_timestamp = World::read_i32(&mut iterator)?;
         }
 		// Main.rightWorld = fileIO.ReadInt32();
-        self.w_right = World::read_i32(&mut iterator);
+        self.w_right = World::read_i32(&mut iterator)?;
 		// Main.bottomWorld = fileIO.ReadInt16();
-        self.w_bot = World::read_i16(&mut iterator);
+        self.w_bot = World::read_i16(&mut iterator)?;
 	    // Main.maxTilesY = fileIO.ReadInt16();
-        self.max_tiles_y = World::read_i16(&mut iterator);
+        self.max_tiles_y = World::read_i16(&mut iterator)?;
 		// Main.maxTilesX = fileIO.ReadInt16();
-        self.max_tiles_x = World::read_i16(&mut iterator);        
+        self.max_tiles_x = World::read_i16(&mut iterator)?;        
         // 1851
         
-//      Main.spawnTileX = fileIO.ReadInt16();
-        self.spawn_tile_x = World::read_i16(&mut iterator);
-//		Main.spawnTileY = fileIO.ReadInt16();
-        self.spawn_tile_y = World::read_i16(&mut iterator);
-//		Main.worldSurface = fileIO.ReadInt16();
-        self.world_surface = World::read_i16(&mut iterator);
-//		Main.worldSurfacePixels = Main.worldSurface << 4;
-//		Main.rockLayer = fileIO.ReadInt16();
-        self.rock_layer = World::read_i16(&mut iterator);
-//		Main.rockLayerPixels = Main.rockLayer << 4;
+        // Main.spawnTileX = fileIO.ReadInt16();
+        self.spawn_tile_x = World::read_i16(&mut iterator)?;
+        // Main.spawnTileY = fileIO.ReadInt16();
+        self.spawn_tile_y = World::read_i16(&mut iterator)?;
+        // Main.worldSurface = fileIO.ReadInt16();
+        self.world_surface = World::read_i16(&mut iterator)?;
+        // Main.worldSurfacePixels = Main.worldSurface << 4;
+        // Main.rockLayer = fileIO.ReadInt16();
+        self.rock_layer = World::read_i16(&mut iterator)?;
+        // Main.rockLayerPixels = Main.rockLayer << 4;
         // 1862
+        self.world_time = World::read_single(&mut iterator)?;
+        self.day_time = World::read_bool(&mut iterator)?;
+        self.moon_phase = World::read_byte(&mut iterator)?;
+
 
         Ok(())
     }
