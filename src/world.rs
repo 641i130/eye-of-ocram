@@ -48,25 +48,12 @@ impl World {
         }
     }
     fn read_i32<R: std::io::Read>(iterator: &mut std::io::Bytes<R>) -> i32 {
-        i32::from_le_bytes(iterator.next_chunk(4))
-        /*
-        let mut out:[u8;4] = [0,0,0,0];
-        let mut c = 0;
-        for _ in 0..4 { // read 4 bytes into i32
-            out[c] = World::get_byte(iterator).clone();
-            c+=1;
-        }
-        i32::from_le_bytes(out) as i32
-        */
+        let val:[u8;4] = iterator.next_chunk::<4>().unwrap().map(|val| val.unwrap());
+        i32::from_le_bytes(val)
     }
     fn read_i16<R: std::io::Read>(iterator: &mut std::io::Bytes<R>) -> i16 {
-        let mut out:[u8;2] = [0,0];
-        let mut c = 0;
-        for _ in 0..2 { // read 4 bytes into i32
-            out[c] = World::get_byte(iterator).clone();
-            c+=1;
-        }
-        i16::from_le_bytes(out) as i16
+        let val:[u8;2] = iterator.next_chunk::<2>().unwrap().map(|val| val.unwrap());
+        i16::from_le_bytes(val)
     }
     fn read_string<R: std::io::Read>(iterator: &mut std::io::Bytes<R>) -> String {
         // readString(length) {
