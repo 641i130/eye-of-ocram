@@ -3,7 +3,7 @@ use std::io::Read;
 
 pub struct World {
     pub file_name: String,
-    pub version: u8,   // first byte of file
+    pub version: i32,   // first byte of file
     pub name: String,  // length is byte before i think...
     pub file_type: u8, // first byte of file
     pub w_left: u8,    // World Dimensions
@@ -31,12 +31,21 @@ impl World {
         }
     }
     fn get_byte<R: std::io::Read>(iterator: &mut std::io::Bytes<R>) -> u8 {
-        iterator.next().expect("No more bytes").unwrap()
+        iterator.next().expect("No more bytes").unwrap();
     }
     fn skip_bytes<R: std::io::Read>(iterator: &mut std::io::Bytes<R>, count: u8) {
         for _ in 0..count {
             let _ = iterator.next().expect("No more bytes!").unwrap();
         }
+    }
+    fn read_i32<R: std::io::Read>(iterator: &mut std::io::Bytes<R>) -> i32 {
+        let mut out:[u8;4] = [0,0,0,0];
+        let mut c = 0;
+        for _ in 0..4 { // read 4 bytes into i32
+            out[c] = World::get_byte(iterator).clone();
+            c+=1;
+        }
+        i32::from_le_bytes(out) as i32
     }
     fn read_string<R: std::io::Read>(iterator: &mut std::io::Bytes<R>) -> String {
         // readString(length) {
@@ -62,23 +71,29 @@ impl World {
         let mut iterator = wldp.input.bytes();
 
         // TODO move to reader with the iterator etc etc
-        self.version = World::get_byte(&mut iterator);
-        World::skip_bytes(&mut iterator, 7); // Skip 7 bytes!
+        self.version = World::read_i32(&mut iterator);
+        World::skip_bytes(&mut iterator, 4); // Skip 4 bytes! // TODO fix this
         self.name = World::read_string(&mut iterator); // Read first byte, then read the following
                                                        // bytes as a char array then convert to
                                                        // string
         
         // USED FOR MAP STUFF ???
+        // fileIO.ReadString();
+		
+		// int worldID = fileIO.ReadInt32();
         self.file_type = World::get_byte(&mut iterator);
-
-        self.w_left = World::get_byte(&mut iterator);
+		// int worldTimestamp = (release >= 48) ? fileIO.ReadInt32() : 0;
+		
+		// Main.rightWorld = fileIO.ReadInt32();
         self.w_right = World::get_byte(&mut iterator);
-        self.w_top = World::get_byte(&mut iterator);
+		// Main.bottomWorld = fileIO.ReadInt16();
         self.w_bot = World::get_byte(&mut iterator);
-
+	    // Main.maxTilesY = fileIO.ReadInt16();
         self.max_tiles_y = World::get_byte(&mut iterator);
+		// Main.maxTilesX = fileIO.ReadInt16();
         self.max_tiles_x = World::get_byte(&mut iterator);
         
+
         self.moon_type = World::get_byte(&mut iterator); // maybe its actually creation time
         Ok(())
     }
@@ -86,10 +101,10 @@ impl World {
         println!("\nWorld version : {:?}", self.version);
         println!("World Name : {:?}", self.name);
         println!("World dimensions (origin is top left): ");
-        println!("\tL:{} R:{}", self.w_left as i32, self.w_right as i32);
-        println!("\tT:{} B:{}", self.w_top as i32, self.w_bot as i32);
-        println!("Max Tiles X:{}", self.max_tiles_x as i32);
-        println!("Max Tiles Y:{}", self.max_tiles_y as i32);
+        println!("\tMax Right:{}", self.w_right as i32);
+        println!("\tBottom:{}", self.w_bot as i16);
+        println!("Max Tiles X:{}", self.max_tiles_x as i16);
+        println!("Max Tiles Y:{}", self.max_tiles_y as i16);
         println!("Moon type:{}",self.moon_type); // My guess is there are these options:
                                                       // 10011111
                                                       // 01011111
