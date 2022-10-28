@@ -42,7 +42,7 @@ impl World {
     fn get_byte<R: std::io::Read>(iterator: &mut std::io::Bytes<R>) -> u8 {
         iterator.next().expect("No more bytes").unwrap()
     }
-    fn skip_bytes<R: std::io::Read>(iterator: &mut std::io::Bytes<R>, count: u8) {
+    fn skip_bytes<R: std::io::Read>(iterator: &mut std::io::Bytes<R>, count: usize) {
         for _ in 0..count {
             let _ = iterator.next().expect("No more bytes!").unwrap();
         }
