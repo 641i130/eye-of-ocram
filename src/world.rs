@@ -1,6 +1,7 @@
 use std::io::Read;
 use std::fs::File;
 
+#[derive(Debug)]
 pub struct World {
     pub file_name: String,
     pub version: i32,   // first byte of file
@@ -13,6 +14,9 @@ pub struct World {
     pub w_bot: i16,
     pub max_tiles_x: i16,
     pub max_tiles_y: i16,
+    pub spawn_tile_x: i16,
+    pub spawn_tile_y: i16,
+    pub world_surface: i16,
 }
 impl World {
     pub fn new(wldfile: &String) -> World {
@@ -28,6 +32,9 @@ impl World {
             w_bot: 0,
             max_tiles_x: 0,
             max_tiles_y: 0,
+            spawn_tile_x: 0,
+            spawn_tile_y: 0,
+            world_surface: 0,
         }
     }
     fn get_byte<R: std::io::Read>(iterator: &mut std::io::Bytes<R>) -> u8 {
@@ -54,7 +61,6 @@ impl World {
             out[c] = World::get_byte(iterator).clone();
             c+=1;
         }
-        dbg!(out);
         i16::from_le_bytes(out) as i16
     }
     fn read_string<R: std::io::Read>(iterator: &mut std::io::Bytes<R>) -> String {
@@ -90,7 +96,9 @@ impl World {
 		// int worldID = fileIO.ReadInt32();
         self.file_type = World::read_i32(&mut iterator);
 		// int worldTimestamp = (release >= 48) ? fileIO.ReadInt32() : 0;
-        self.world_timestamp = World::read_i32(&mut iterator);
+        if self.version >= 48 {
+            self.world_timestamp = World::read_i32(&mut iterator);
+        }
 		// Main.rightWorld = fileIO.ReadInt32();
         self.w_right = World::read_i32(&mut iterator);
 		// Main.bottomWorld = fileIO.ReadInt16();
@@ -99,10 +107,25 @@ impl World {
         self.max_tiles_y = World::read_i16(&mut iterator);
 		// Main.maxTilesX = fileIO.ReadInt16();
         self.max_tiles_x = World::read_i16(&mut iterator);        
+        // 1851
+        
+//      Main.spawnTileX = fileIO.ReadInt16();
+        self.spawn_tile_x = World::read_i16(&mut iterator);
+//		Main.spawnTileY = fileIO.ReadInt16();
+        self.spawn_tile_y = World::read_i16(&mut iterator);
+//		Main.worldSurface = fileIO.ReadInt16();
+        self.world_surface = World::read_i16(&mut iterator);
+//		Main.worldSurfacePixels = Main.worldSurface << 4;
+//		Main.rockLayer = fileIO.ReadInt16();
+        self.rock_layer = World::read_i16(&mut iterator);
+//		Main.rockLayerPixels = Main.rockLayer << 4;
+        // 1862
 
         Ok(())
     }
     pub fn pretty_print(self) {
+        dbg!(self);
+        /*
         println!("\nWorld version : {:?}", self.version);
         println!("World Name : {:?}", self.name);
         println!("World dimensions (origin is top left): ");
@@ -110,5 +133,6 @@ impl World {
         println!("\tBottom:{}", self.w_bot);
         println!("Max Tiles X:{}", self.max_tiles_x);
         println!("Max Tiles Y:{}", self.max_tiles_y);
+        */
     }
 }
