@@ -2,6 +2,11 @@ use std::io::Read;
 use std::fs::File;
 
 #[derive(Debug)]
+pub struct Tile {
+
+}
+
+#[derive(Debug)]
 pub struct World {
     pub file_name: String,
     pub version: i32,   // first byte of file
@@ -201,14 +206,5 @@ impl World {
     }
     pub fn pretty_print(self) {
         dbg!(self);
-        /*
-        println!("\nWorld version : {:?}", self.version);
-        println!("World Name : {:?}", self.name);
-        println!("World dimensions (origin is top left): ");
-        println!("\tMax Right:{}", self.w_right);
-        println!("\tBottom:{}", self.w_bot);
-        println!("Max Tiles X:{}", self.max_tiles_x);
-        println!("Max Tiles Y:{}", self.max_tiles_y);
-        */
     }
 }
