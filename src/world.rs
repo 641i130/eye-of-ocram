@@ -1,23 +1,24 @@
 use std::io::Read;
 use std::fs::File;
 
+#[derive(Debug)]
 enum Flags {
-    wallframe_mask = 0x3,
-    nearby = 0x4,
-    visited = 0x8,
-    wire = 0x10,
-    selected = 0x20,
-    lava = 0x20,
-    checking_liquid = 0x40,
-    skip_liquid = 0x80,
-    highlight_mask = 0x24,
+    WallframeMask = 0x3,
+    Nearby = 0x4,
+    Visited = 0x8,
+    Wire = 0x10,
+    Selected = 0x20,
+    Lava = 0x21,
+    CheckingLiquid = 0x40,
+    SkipLiquid = 0x80,
+    HighlightMask = 0x24,
 }
 
 #[derive(Debug)]
 pub struct Tile {
     pub active: u8, // all byte types should be this type in rust
     pub t_type: u8,
-    pub flags: Flags,
+    flags: Flags,
     pub liquid: u8,
     pub lava: u8,
     pub wall: u8,
@@ -27,17 +28,19 @@ pub struct Tile {
     pub frame_x: u8,
     pub frame_y: u8,
 }
+/*
+#[derive(Debug)]
 pub impl Tile {
     fn get_wallframe_num(&self) -> i32 {
         // This casts the flags bytes into i32 i think
         // (int)(flags & Flags.WALLFRAME_MASK);
-        (self.flags & Flags.wallframe_mask) as i32
+        (self.flags & Flags.WallframeMask) as i32
     }
     fn set_wallframe_num(&mut self) {
-        self.flags = (Flags.WALLFRAME_MASK | Flags.)
+        self.flags = self.flags | (self.flags & Flags.WallframeMask);
     }
 }
-
+*/
 #[derive(Debug)]
 pub struct World {
     pub file_name: String,
@@ -233,7 +236,20 @@ impl World {
         self.invasion_size = World::read_i16(&mut iterator)?;
         self.invasion_type = World::get_byte(&mut iterator);
         self.invasionx = World::read_single(&mut iterator)?;
-
+        // LOOP OVER EVERY TILE IN WLD FILE!!!
+        println!("Tiles:");
+        let mut c = 0;
+        let mut b = 0;
+        for x in 0..self.max_tiles_x {
+            for y in 0..self.max_tiles_y {
+                b+=1;
+                if World::read_bool(&mut iterator)? {
+                    println!("An important tile: {:?}",World::get_byte(&mut iterator));
+                    c+=1;
+                }
+            }
+        }
+        println!("There are {c} active tiles out of {b}!");
         Ok(())
     }
     pub fn pretty_print(self) {
