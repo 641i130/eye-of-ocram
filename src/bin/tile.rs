@@ -1,3 +1,5 @@
+use std::ops::BitOr;
+
 #[derive(Debug)]
 pub struct Tile {
     active: u8,
