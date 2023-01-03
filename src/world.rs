@@ -83,7 +83,7 @@ pub struct World {
     pub invasion_type: u8,
     pub invasionx: f32,
     // 1887
-
+    pub tile: Tile,
 
 }
 impl World {
@@ -240,23 +240,89 @@ impl World {
         
         // Setup world render
 
-        let mut image: RgbImage = ImageBuffer::new(self.max_tiles_x, self.max_tiles_y);
+        let mut image: RgbImage = ImageBuffer::new(self.max_tiles_x.try_into().unwrap(), self.max_tiles_y.try_into().unwrap());
 
         // LOOP OVER EVERY TILE IN WLD FILE!!!
         println!("Tiles:");
         let mut c = 0;
         let mut b = 0;
-        for x in 0..self.max_tiles_x {
+        for i in 0..self.max_tiles_x {
+			if (i & 0x1F) == 0 {
+                // Progress bar progress
+				// UI.main.progress = (float)i / (float)Main.maxTilesX;
+				()
+			}
+			let ptr:Tile = self.tile[i, 0];
             for y in 0..self.max_tiles_y {
                 // Starts on line 1888
-                let b = World::get_byte(&mut iterator));
+                let b = World::get_byte(&mut iterator);
                 // DO checks on byte to determine if its a tile, what type, what hammer format, etc
                 if b == 1 {
-                    if b == 
-                        *image.get_pixel_mut(5, 5) = image::Rgb([255,255,255]);
+                    *image.get_pixel_mut(5, 5) = image::Rgb([255,255,255]);
                 }
             }
         }
+        /*
+				fixed (Tile* ptr = &Main.tile[i, 0])
+				{
+					Tile* ptr2 = ptr;
+					int num = 0;
+					while (num < Main.maxTilesY)
+					{
+						ptr2->flags = ~(Tile.Flags.WALLFRAME_MASK | Tile.Flags.NEARBY | Tile.Flags.VISITED | Tile.Flags.WIRE | Tile.Flags.SELECTED | Tile.Flags.CHECKING_LIQUID | Tile.Flags.SKIP_LIQUID);
+						ptr2->active = fileIO.ReadByte();
+						if (ptr2->active != 0)
+						{
+							ptr2->type = fileIO.ReadByte();
+							if (ptr2->type == 127)
+							{
+								ptr2->active = 0;
+							}
+							if (Main.tileFrameImportant[ptr2->type])
+							{
+								ptr2->frameX = fileIO.ReadInt16();
+								ptr2->frameY = fileIO.ReadInt16();
+								if (ptr2->type == 144)
+								{
+									ptr2->frameY = 0;
+								}
+							}
+							else
+							{
+								ptr2->frameX = -1;
+								ptr2->frameY = -1;
+							}
+						}
+						ptr2->wall = fileIO.ReadByte();
+						ptr2->liquid = fileIO.ReadByte();
+						if (ptr2->liquid > 0 && fileIO.ReadBoolean())
+						{
+							ptr2->lava = 32;
+						}
+						ptr2->flags |= (Tile.Flags)fileIO.ReadByte();
+						if (Main.IsTutorial())
+						{
+							ptr2->flags &= ~Tile.Flags.VISITED;
+						}
+						int num2 = fileIO.ReadByte();
+						if ((num2 & 0x80) != 0)
+						{
+							num2 &= 0x7F;
+							num2 |= fileIO.ReadByte() << 7;
+						}
+						num += num2;
+						while (num2 > 0)
+						{
+							ptr2[1] = *ptr2;
+							ptr2++;
+							num2--;
+						}
+						num++;
+						ptr2++;
+					}
+				}
+			}
+        */
         image.save("output.png").unwrap();
         println!("There are {c} active tiles out of {b}!");
         Ok(())
