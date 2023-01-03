@@ -31,6 +31,15 @@ pub enum Flags {
     HighlightMask = 0x24,
 }
 
+impl BitOr for Flags {
+    type Output = Self;
+
+    // rhs is the "right-hand side" of the expression `a | b`
+    fn bitor(self, rhs: Self) -> Self::Output {
+        Self(self.0 | rhs.0)
+    }
+}
+
 pub impl Tile {
     fn new() -> Self {
         Tile {
@@ -104,21 +113,21 @@ pub impl Tile {
 
 fn main() {
     let tile:Tile = Tile { 
-        active: val, 
-        tile_type: val, 
-        flags: val, 
-        liquid: val, 
-        lava: val, 
-        wall: val, 
-        wall_frame_x: val, 
-        wall_frame_y: val, 
-        frame_number: val, 
-        frame_x: val, 
-        frame_y: val, 
-        wall_frame_number: val, 
-        checking_liquid: val, 
-        skip_liquid: val, 
-        wire: val 
+        active: 1, 
+        tile_type: 244, 
+        flags: Flags::Wire, 
+        liquid: 0, 
+        lava: 0, 
+        wall: 0, 
+        wall_frame_x: 123, 
+        wall_frame_y: 321, 
+        frame_number: 0, 
+        frame_x: 123, 
+        frame_y: 321, 
+        wall_frame_number: 0, 
+        checking_liquid: 0, 
+        skip_liquid: 0, 
+        wire: 2 
     };
     dbg!(&tile);
 }
