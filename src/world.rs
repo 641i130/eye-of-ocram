@@ -1,8 +1,9 @@
 use std::io::Read;
 use std::fs::File;
+use image::{ImageBuffer, RgbImage};
 
 #[derive(Debug)]
-enum Flags {
+pub enum Flags {
     WallframeMask = 0x3,
     Nearby = 0x4,
     Visited = 0x8,
@@ -18,7 +19,7 @@ enum Flags {
 pub struct Tile {
     pub active: u8, // all byte types should be this type in rust
     pub t_type: u8,
-    flags: Flags,
+    pub flags: Flags,
     pub liquid: u8,
     pub lava: u8,
     pub wall: u8,
@@ -236,19 +237,27 @@ impl World {
         self.invasion_size = World::read_i16(&mut iterator)?;
         self.invasion_type = World::get_byte(&mut iterator);
         self.invasionx = World::read_single(&mut iterator)?;
+        
+        // Setup world render
+
+        let mut image: RgbImage = ImageBuffer::new(self.max_tiles_x, self.max_tiles_y);
+
         // LOOP OVER EVERY TILE IN WLD FILE!!!
         println!("Tiles:");
         let mut c = 0;
         let mut b = 0;
         for x in 0..self.max_tiles_x {
             for y in 0..self.max_tiles_y {
-                b+=1;
-                if World::read_bool(&mut iterator)? {
-                    println!("An important tile: {:?}",World::get_byte(&mut iterator));
-                    c+=1;
+                // Starts on line 1888
+                let b = World::get_byte(&mut iterator));
+                // DO checks on byte to determine if its a tile, what type, what hammer format, etc
+                if b == 1 {
+                    if b == 
+                        *image.get_pixel_mut(5, 5) = image::Rgb([255,255,255]);
                 }
             }
         }
+        image.save("output.png").unwrap();
         println!("There are {c} active tiles out of {b}!");
         Ok(())
     }

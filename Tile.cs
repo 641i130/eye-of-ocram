@@ -17,29 +17,17 @@ namespace Terraria
 			SKIP_LIQUID = 0x80,
 			HIGHLIGHT_MASK = 0x24
 		}
-
 		public byte active;
-
 		public byte type;
-
 		public Flags flags;
-
 		public byte liquid;
-
 		public byte lava;
-
 		public byte wall;
-
 		public ushort wallFrameX;
-
 		public byte wallFrameY;
-
 		public byte frameNumber;
-
 		public short frameX;
-
 		public short frameY;
-
 		public int wallFrameNumber
 		{
 			get
@@ -91,6 +79,7 @@ namespace Terraria
 		public void Clear()
 		{
 			active = 0;
+			// Zero out flags ~ invertt (make it all 111111)
 			flags = ~(Flags.WALLFRAME_MASK | Flags.NEARBY | Flags.VISITED | Flags.WIRE | Flags.SELECTED | Flags.CHECKING_LIQUID | Flags.SKIP_LIQUID);
 			type = 0;
 			wall = 0;
