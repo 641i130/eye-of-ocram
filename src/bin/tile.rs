@@ -1,6 +1,6 @@
-use std::ops::BitOr;
+use std::ops::{BitOr,Not};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Tile {
     active: u8,
     tile_type: u8,
@@ -19,7 +19,7 @@ pub struct Tile {
     wire: i32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 #[repr(u8)]
 pub enum Flags {
     WallframeMask = 0x3,
@@ -42,6 +42,16 @@ impl BitOr for Flags {
     }
 }
 
+impl Not for Flags {
+    type Output = Self;
+
+    fn not(self) -> Self::Output {
+        match self {
+            Answer::Yes => Answer::No ,
+            Answer::No => Answer::Yes
+        }
+    }
+}
 pub impl Tile {
     fn new() -> Self {
         Tile {
