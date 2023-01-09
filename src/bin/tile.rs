@@ -1,3 +1,4 @@
+/*
 use std::ops::{BitOr,Not};
 
 #[derive(Debug, PartialEq)]
@@ -142,4 +143,4 @@ fn main() {
         wire: 2 
     };
     dbg!(&tile);
-}
+}*/

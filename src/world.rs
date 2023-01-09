@@ -246,19 +246,131 @@ impl World {
         println!("Tiles:");
         let mut c = 0;
         let mut b = 0;
-        for i in 0..self.max_tiles_x {
-			if (i & 0x1F) == 0 {
+        for x in 0..self.max_tiles_x {
+			if (x & 0x1F) == 0 {
                 // Progress bar progress
 				// UI.main.progress = (float)i / (float)Main.maxTilesX;
 				()
 			}
-			let ptr:Tile = self.tile[i, 0];
+			// let ptr:Tile = self.tile[i, 0];
             for y in 0..self.max_tiles_y {
                 // Starts on line 1888
+                const tile = data[x][y];
+                let flags1, flags2, flags3, flags4;
+
+                const startY = y;
+                while (y < this.options.world.header.maxTilesY && JSON.stringify(tile) === JSON.stringify(data[x][y])) {
+                    y+=1;
+                }
+                const RLE = y - startY - 1;
+
+                if (RLE) {
+                    if (RLE > 255)
+                        flags1 |= 128;
+                    else
+                        flags1 |= 64;
+                }
+
+                if (typeof tile.blockId == "number") {
+                    flags1 |= 2;
+
+                    if (tile.blockId > 255)
+                        flags1 |= 32;
+                }
+
+                if (tile.wallId) {
+                    flags1 |= 4;
+
+                    if (tile.wallId > 255)
+                        flags3 |= 64
+                }
+
+                if (tile.liquidType) {
+                    switch (tile.liquidType) {
+                        case "water": flags1 |= (1 << 3); break;
+                        case "lava": flags1 |= (2 << 3); break;
+                        case "shimmer": flags3 |= 128;
+                        case "honey": flags1 |= (3 << 3); break;
+                    }
+                }
+
+                if (tile.slope) {
+                    switch (tile.slope) {
+                        case "half": flags2 |= (1 << 4); break;
+                        case "TR": flags2 |= (2 << 4); break;
+                        case "TL": flags2 |= (3 << 4); break;
+                        case "BR": flags2 |= (4 << 4); break;
+                        case "BL": flags2 |= (5 << 4); break;
+                    }
+                }
+
+
+                match tile {
+                    Tile { wireRed: true, .. } => flags2 |= 2,
+                    Tile { wireBlue: true, .. } => flags2 |= 4,
+                    Tile { wireGreen: true, .. } => flags2 |= 8,
+                    Tile { wireYellow: true, .. } => flags3 |= 32,
+                    Tile { actuated: true, .. } => flags3 |= 4,
+                    Tile { actuator: true, .. } => flags3 |= 2,
+                    Tile { wallColor: true, .. } => flags3 |= 16,
+                    Tile { blockColor: true, .. } => flags3 |= 8,
+                    Tile { invisibleBlock: true, .. } => flags4 |= 2,
+                    Tile { invisibleWall: true, .. } => flags4 |= 4,
+                    Tile { fullBrightBlock: true, .. } => flags4 |= 8,
+                    Tile { fullBrightWall: true, .. } => flags4 |= 16,
+                    _ => (),
+                }
+                if (flags4) {
+                    this.saveUInt8(flags1 | 1);
+                    this.saveUInt8(flags2 | 1);
+                    this.saveUInt8(flags3 | 1);
+                } else if (flags3) {
+                    this.saveUInt8(flags1 | 1);
+                    this.saveUInt8(flags2 | 1);
+                } else if (flags2) {
+                    this.saveUInt8(flags1 | 1);
+                } else {
+                    this.saveUInt8(flags1);
+                }
+
+                if (flags1 & 2) {
+                    if (flags1 & 32)
+                        this.saveUInt16(tile.blockId);
+                    else
+                        this.saveUInt8(tile.blockId);
+
+                    if (this.options.world.fileFormatHeader.importants[tile.blockId]) {
+                        this.saveInt16(tile.frameX);
+                        this.saveInt16(tile.frameY);
+                    }
+
+                    if (flags3 & 8)
+                        this.saveUInt8(tile.blockColor);
+                }
+
+                if (flags1 & 4) {
+                    this.saveUInt8(tile.wallId & 255);
+
+                    if (flags3 & 16)
+                        this.saveUInt8(tile.wallColor);
+                }
+
+                if (typeof tile.liquidAmount == "number")
+                    this.saveUInt8(tile.liquidAmount);
+
+                if (flags3 & 64)
+                    this.saveUInt8(1);
+
+                if (RLE) {
+                    if (RLE > 255)
+                        this.saveUInt16(RLE);
+                    else
+                        this.saveUInt8(RLE);
+                }
                 let b = World::get_byte(&mut iterator);
                 // DO checks on byte to determine if its a tile, what type, what hammer format, etc
-                if b == 1 {
-                    *image.get_pixel_mut(5, 5) = image::Rgb([255,255,255]);
+                if b == 1 { // Tile is active
+                    *image.get_pixel_mut(x, y) = image::Rgb([255,255,255]);
                 }
             }
         }

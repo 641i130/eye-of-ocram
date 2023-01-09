@@ -1,3 +1,4 @@
+/*
 #[derive(Debug)]
 pub struct Tile {
     active: u8,
@@ -78,4 +79,4 @@ pub impl Tile {
                     return false;
                 }
                
-
+*/
